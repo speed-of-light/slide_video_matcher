@@ -1,4 +1,5 @@
 # Class use for capture video
+# @author speed-of-light@github
 # @!attribute [r] :stream_path
 #   @return [String] A stream path for capture operations
 # @version 0.1.0
@@ -31,32 +32,65 @@ class Video::Cap
     set_stream_path(sp) if not sp.empty?
   end
 
-  # Method for dump and manipulate all single frame from a given stream.
-  # @param from [Fixnum] grab the frame from this index.
-  # @param to [Fixnum] grab the frame to this index, use nil to get all.
-  # @return [Array] with given block.
-  def dump from, to
+  # Light version of cached_dump, only accept given ranges
+  # @option (see #cached_dump)
+  # @return (see #cached_dump)
+  # @see #cached_dump
+  # @example Get raw image sum
+  #   cap.dump(from: 0, to: 10){|c| cap.check_dump(c) }
+  def dump opts={}
+    fr = opts[:from] || 0
+    to = opts[:to] || -1
+    cached_dump(from: fr, to: to, cache_size: 1, interval: 1000) do |cache|
+      yield(cache)
+    end
+  end
+
+  # Dump stream frame with given range, and manipulate with cached image array.
+  # @option opts [Integer] :from (0) time from the start frame.
+  # @option opts [Integer] :to (-1) time to the end frame.
+  # @option opts [Integer] :cache_size (1) the size of cache.
+  # @option opts [Integer] :interval (1000) the captured frame interval.
+  # @return [Array] a collection of handled data
+  # @see #dump
+  # @example Get raw image sum
+  #   cap.cached_dump(from: 0, to: 10, cache_size: 3){|c| cap.check_dump(c) }
+  def cached_dump opts={}
+    return nil if @cap.nil?
     cc = @cap
-    top = (to == nil) ? cc.frame_count / cc.fps : to
-    i = from
-    prev = nil
-    a = []
-    while i <= top
-      cc.millisecond = i * 1000
+    fs = cc.frame_count / cc.fps
+    fr = opts[:from] || 0
+    to = (opts[:to] == -1 || opts[:to].nil?) ? fs : opts[:to]
+    cs = opts[:cache_size] || 1
+    iv = opts[:interval] || 1000
+    ca = []
+    ra = []
+    i = fr
+    while i <= to
+      cc.millisecond = i * iv
       break unless cc.grab
-      img = cc.retrieve
-      a << yield(img) if block_given?
-      puts "val: #{img[12][0]}, ms: #{cc.millisecond}"
+      ca << cc.retrieve
+      ra << yield( ca ) if block_given?
+      puts "Operation on #{cc.millisecond} ms"
+      ca.shift 1 if ca.size % cs == 0
       i += 1
     end
-    a
+    ra
   end
 
   # sum and diff with previous image
-  # @param img [OpenCV::lplimage] image variable from #dump
   # @return [Object] the returned object will fill into array
-  def sum_diff img
-    img.sum
+  # @see #cached_dump
+  def diff_image
+    cached_dump(from: 0, to: 10, cache_size: 2) do |c|
+      next if c[1].nil?
+      ai = (c[1].sum - c[0].sum).to_a
+    end
+  end
+
+  # @!visibility private
+  def check_dump cache, img
+    puts "cache size: #{cache.size}, img raw: #{img[20][0]}"
   end
 
 private
