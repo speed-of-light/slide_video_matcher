@@ -81,10 +81,11 @@ class Video::Cap
   # sum and diff with previous image
   # @return [Object] the returned object will fill into array
   # @see #cached_dump
-  def diff_image
+  def diff_img
     cached_dump(from: 0, to: 10, cache_size: 2) do |c|
       next if c[1].nil?
-      ai = (c[1].sum - c[0].sum).to_a
+      #sum
+      (c[1].sum - c[0].sum).to_a.inject(0){|mem, obj| mem+obj}.abs
     end
   end
 
@@ -93,12 +94,33 @@ class Video::Cap
     puts "cache size: #{cache.size}, img raw: #{img[20][0]}"
   end
 
+  def outliers ary=[], type=:mild
+    iqq = { mild: 1.5, extreme: 3 }
+    iq  = type.class == Fixnum ? type : iqq[type]
+    sa  = ary.sort
+    q1  = percentile sa, 0.25
+    mid = percentile sa, 0.5
+    q3  = percentile sa, 0.75
+    iqr = (q3 - q1)*iq
+    #fence = (q1 - iqr)..(q3 + iqr)
+    fence = q3+iqr
+    o = ary.reject{|v| v < fence}
+  end
+
 private
 
   def set_stream_path(value)
     @stream_path = value
     @cap = CvCapture.open(@stream_path)
     puts "Stream path setted\n#{to_s}"
+  end
+
+  def percentile(ary=[], percent=0.0)
+    # multiply items in the array by the required percentile
+    # (e.g. 0.75 for 75th percentile)
+    # round the result up to the next whole number
+    # then subtract one to get the array item we need to return
+    ary ? ary[((ary.length * percent).ceil)-1] : nil
   end
 end
 
