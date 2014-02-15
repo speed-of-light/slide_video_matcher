@@ -37,6 +37,8 @@ class Video:
     self.stream_path = stream_path
 
   def get_frame(self, index):
+    """Return converted image for show in matplotlib
+    """
     if index > self.frame_count: raise Exception("Frame index is out of range.")
     capture = cv2.VideoCapture(self.vpath)
     capture.set(cv.CV_CAP_PROP_POS_FRAMES, index)
@@ -78,7 +80,7 @@ class Video:
     cap = self.cap['cap']
     cap.set(cv.CV_CAP_PROP_POS_MSEC, ms)
     grabed, img = cap.read()
-    return img
+    return img[:,:,[2,1,0]] #convert for matplotlib
 
   def diff_pre(self, start=0, end=-1, fence="mild"):
     """

@@ -10,3 +10,4 @@ play.py
 pylib/*.ipynb
 pylib/**.ipynb
 pylib/.ipynb_checkpoints
+tmp
