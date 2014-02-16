@@ -137,5 +137,3 @@ class Matcher:
     """TODO return key points plotted on given images
     """
     #img = cv2.drawKeypoints( img_src, kp, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-
