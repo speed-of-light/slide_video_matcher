@@ -151,14 +151,19 @@ class PdfSlider():
     """The root of slide images
     """
     return "./tmp/{}".format(self.filename)
+  @property
+  def pages(self):
+    """The root of slide images
+    """
+    return self.pages
 
   def __init__(self, pdf_path):
     self.pdf_path = pdf_path
-    self.to_jpg()
+    pdf = PdfFileReader(self.pdf_path)
+    self.pages = pdf.getNumPages()
 
   def to_jpg(self):
-    pdf = PdfFileReader(self.pdf_path)
-    pages = pdf.getNumPages()
+    pages = self.pages
     if pages < 1: return
     fn = self.filename = os.path.splitext(os.path.basename(self.pdf_path))[0]
     tmpdf = "./tmp/{}".format(fn)
