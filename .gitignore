@@ -1,0 +1,13 @@
+vendor
+.bundle
+.yardoc
+doc
+dev
+*.ipynb
+*.pyc
+*.csv
+play.py
+pylib/*.ipynb
+pylib/**.ipynb
+pylib/.ipynb_checkpoints
+tmp
