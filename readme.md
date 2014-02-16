@@ -6,12 +6,15 @@ Match slides with video
 
 # Versions
 
-- 0.1.0:
+- 0.1.0:2014-02-16 Sun 01:15 PM
   - Initial project
+  - with ruby image reading process
+  - with python sift feature grabing process (much complete than ruby version)
 
 # Environment
 
 - Ruby 2.0.0-p247
+- Python 2.7.6
 - [OpenCV 2.4.8](http://opencv.org/)
 
 # License
