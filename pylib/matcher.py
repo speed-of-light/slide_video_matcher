@@ -1,9 +1,8 @@
 import cv2, cv
-import collections
+import collections, os
 import numpy as np
 import pandas as pd
 import glob, os.path
-
 class Matcher:
   """
   Author: speed-of-light
@@ -137,3 +136,36 @@ class Matcher:
     """TODO return key points plotted on given images
     """
     #img = cv2.drawKeypoints( img_src, kp, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+
+from PyPDF2 import PdfFileReader
+from pgmagick import Image
+import shutil
+class PdfSlider():
+  """
+  Author: speed-of-light
+  Purpose: Operations on pdf files
+  """
+  @property
+  def slide_path(self):
+    """The root of slide images
+    """
+    return "./tmp/{}".format(self.filename)
+
+  def __init__(self, pdf_path):
+    self.pdf_path = pdf_path
+    self.to_jpg()
+
+  def to_jpg(self):
+    pdf = PdfFileReader(self.pdf_path)
+    pages = pdf.getNumPages()
+    if pages < 1: return
+    fn = self.filename = os.path.splitext(os.path.basename(self.pdf_path))[0]
+    tmpdf = "./tmp/{}".format(fn)
+    if os.path.exists( tmpdf ): shutil.rmtree(tmpdf)
+    os.makedirs( tmpdf )
+    conv = Image()
+    conv.density( '100')
+    for page in np.arange( 0, pages, 1):
+      conv.read( "{}[{}]".format(self.pdf_path, page) )
+      conv.write( "{}/slides_{}.jpg".format(tmpdf, page) )

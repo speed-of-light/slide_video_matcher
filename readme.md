@@ -10,6 +10,8 @@ Match slides with video
   - Initial project
   - with ruby image reading process
   - with python sift feature grabing process (much complete than ruby version)
+  - 0.1.1: 2014-02-16 Sun 02:34 PM
+    * Add pdfslider to save images from pdf file
 
 # Environment
 
