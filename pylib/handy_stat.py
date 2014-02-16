@@ -59,6 +59,7 @@ class HandyStat:
         start = end = iv
     if len(ary) > 0: yield(start, end)
 
+  @staticmethod
   def time_delta(ms=0):
     """Format input milliseconds to hh:mm:ss with padding zeros
     """
